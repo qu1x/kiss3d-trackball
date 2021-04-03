@@ -1,0 +1,38 @@
+[package]
+name = "kiss3d-trackball"
+version = "0.1.0"
+authors = ["Rouven Spreckels <rs@qu1x.dev>"]
+edition = "2018"
+description = "Virtual Trackball Camera Mode for Kiss3D"
+documentation = "https://doc.qu1x.dev/kiss3d-trackball"
+repository = "https://github.com/qu1x/kiss3d-trackball"
+readme = "README.md"
+license = "BSD-3-Clause"
+keywords = [
+	"virtual-trackball",
+	"exponential-map",
+	"quaternion",
+	"arcball",
+	"camera",
+]
+categories = [
+	"graphics",
+]
+include = [
+	"src/**/*.rs",
+	"Cargo.toml",
+	"README.md",
+	"RELEASES.md",
+	"LICENSE.md",
+]
+
+[badges]
+travis-ci = { repository = "qu1x/kiss3d-trackball" }
+
+[dependencies]
+kiss3d = "0.30"
+nalgebra = "0.25"
+trackball = "0.2"
+
+[features]
+cc = ["trackball/cc"]
