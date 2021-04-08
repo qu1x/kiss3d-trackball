@@ -1,6 +1,6 @@
 //! Virtual Trackball Camera Mode for Kiss3D
 //!
-//! Complements common [`trackball`] operation handlers with [`kiss3d`] specific [`Input`] resulting
+//! Complements common [`trackball`] operation handlers with [`kiss3d`]-specific [`Input`] resulting
 //! in a compound [`Trackball`] [`Camera`] mode implementation for the [`kiss3d`] graphics library.
 
 use kiss3d::{

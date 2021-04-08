@@ -1,13 +1,13 @@
 [package]
 name = "kiss3d-trackball"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Rouven Spreckels <rs@qu1x.dev>"]
 edition = "2018"
 description = "Virtual Trackball Camera Mode for Kiss3D"
 documentation = "https://doc.qu1x.dev/kiss3d-trackball"
 repository = "https://github.com/qu1x/kiss3d-trackball"
 readme = "README.md"
-license = "BSD-3-Clause"
+license = "BSD-2-Clause-Patent"
 keywords = [
 	"virtual-trackball",
 	"exponential-map",
@@ -23,7 +23,7 @@ include = [
 	"Cargo.toml",
 	"README.md",
 	"RELEASES.md",
-	"LICENSE.md",
+	"LICENSES/*.md",
 ]
 
 [badges]
