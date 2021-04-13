@@ -31,13 +31,13 @@ pub use trackball::Fixed;
 /// Mouse                       | Touch                     | Action
 /// --------------------------- | ------------------------- | --------------------------------------
 /// Left Button Press + Drag    | One-Finger + Drag         | Orbits eye around target.
-/// ⮱ but at trackball's border | Two-Finger + Roll         | Purely rolls eye about view direction.
+/// ↳ but at trackball's border | Two-Finger + Roll         | Purely rolls eye about view direction.
 /// Right Button Press + Drag   | Two-Finger + Drag         | Slides trackball along focus plane.
 /// Scroll In/Out               | Two-Finger + Pinch Out/In | Scales distance zooming in/out.
 /// Left Button Press + Release | Any-Finger + Release      | Slides to cursor/finger position.
 ///
 /// Key                         | Action
-/// --------------------------- | -------------------------------------------------------
+/// --------------------------- | ---------------------------------------------------------
 /// O                           | Switches between orthographic and perspective projection.
 /// Enter                       | Resets camera eye and target to [`Self::reset`].
 ///
