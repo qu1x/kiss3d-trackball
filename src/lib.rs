@@ -15,6 +15,8 @@ use trackball::{Clamp, Frame, Image, Orbit, Scale, Scene, Slide, Touch};
 mod input;
 pub use input::*;
 
+pub use trackball::Fixed;
+
 /// Trackball camera mode.
 ///
 /// A trackball camera is a camera working similarly like a trackball device. The camera eye is
@@ -92,7 +94,7 @@ impl Trackball {
 	}
 	/// Like [`Self::new()`] but with custom frustum.
 	pub fn new_with_frustum(
-		fov: f32,
+		fov: impl Into<Fixed<f32>>,
 		znear: f32,
 		zfar: f32,
 		eye: &Point3<f32>,
