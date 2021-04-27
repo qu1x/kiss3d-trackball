@@ -37,10 +37,12 @@ This license is designed to provide:
 
   * a simple permissive license,
   * that is compatible with the [`GPL-2.0-or-later`], and
-  * which also has an express patent grant included.
+  * which also has an express patent grant included, but
+  * unlike the [`Apache-2.0`] without patent retaliation.
 
 [`BSD-2-Clause-Patent`]: https://spdx.org/licenses/BSD-2-Clause-Patent.html
 [`GPL-2.0-or-later`]: https://spdx.org/licenses/GPL-2.0-or-later.html
+[`Apache-2.0`]: https://spdx.org/licenses/Apache-2.0.html
 
 ## Contribution
 

@@ -6,6 +6,7 @@ use std::marker::PhantomData;
 #[derive(Debug, Clone)]
 pub struct Input<N: RealField> {
 	phantom_data: PhantomData<N>,
+	first_key: Option<Key>,
 	ortho_key: Option<Key>,
 	reset_key: Option<Key>,
 	orbit_button: Option<MouseButton>,
@@ -18,6 +19,7 @@ impl<N: RealField> Default for Input<N> {
 	fn default() -> Self {
 		Self {
 			phantom_data: PhantomData,
+			first_key: Some(Key::LShift),
 			ortho_key: Some(Key::O),
 			reset_key: Some(Key::Return),
 			orbit_button: Some(MouseButton::Button1),
@@ -29,13 +31,23 @@ impl<N: RealField> Default for Input<N> {
 }
 
 impl<N: RealField> Input<N> {
+	/// Key used to enable first person view as long as being pressed.
+	pub fn first_key(&self) -> Option<Key> {
+		self.first_key
+	}
+	/// Sets key used to enable first person view as long as being pressed.
+	///
+	/// Use `None` to disable key.
+	pub fn rebind_first_key(&mut self, key: Option<Key>) {
+		self.first_key = key;
+	}
 	/// Key used to switch between orthographic and perspective projection.
 	pub fn ortho_key(&self) -> Option<Key> {
 		self.ortho_key
 	}
 	/// Sets key used to switch between orthographic and perspective projection.
 	///
-	/// Use `None` to disable switch.
+	/// Use `None` to disable key.
 	pub fn rebind_ortho_key(&mut self, key: Option<Key>) {
 		self.ortho_key = key;
 	}
@@ -45,7 +57,7 @@ impl<N: RealField> Input<N> {
 	}
 	/// Sets key used to reset camera.
 	///
-	/// Use `None` to disable reset.
+	/// Use `None` to disable key.
 	pub fn rebind_reset_key(&mut self, key: Option<Key>) {
 		self.reset_key = key;
 	}
@@ -55,7 +67,7 @@ impl<N: RealField> Input<N> {
 	}
 	/// Sets button used to orbit camera.
 	///
-	/// Use `None` to disable rotation.
+	/// Use `None` to disable button.
 	pub fn rebind_orbit_button(&mut self, button: Option<MouseButton>) {
 		self.orbit_button = button;
 	}
@@ -78,7 +90,7 @@ impl<N: RealField> Input<N> {
 	}
 	/// Sets button used to slide camera.
 	///
-	/// Use `None` to disable slide.
+	/// Use `None` to disable button.
 	pub fn rebind_slide_button(&mut self, button: Option<MouseButton>) {
 		self.slide_button = button;
 	}

@@ -1,3 +1,9 @@
+# Version 0.3.0 (2021-04-28)
+
+  * Add first person view.
+  * Use move semantics whenever otherwise cloning borrowed method arguments.
+  * Reorder arguments of `Trackball::new()` and `Trackball::new_with_frustum()`.
+
 # Version 0.2.0 (2021-04-13)
 
   * Use `Fixed` quantity wrt field of view.
