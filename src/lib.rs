@@ -26,7 +26,7 @@ pub use trackball::Fixed;
 /// into several members defined by the [`trackball`] crate categorizing all the methods to control
 /// the different aspects of a camera.
 ///
-/// # Camera Inputs
+/// # Camera Input
 ///
 /// Following default inputs are defined which are customizable via [`Self::input`]:
 ///
