@@ -148,7 +148,7 @@ impl Camera for Trackball {
 									if let Some((pitch, yaw, yaw_axis)) =
 										self.first.compute(&vec, self.image.max())
 									{
-										self.frame.look_around(pitch, yaw, &yaw_axis);
+										self.frame.look_around(pitch, yaw, yaw_axis);
 									}
 								}
 							} else {
@@ -214,7 +214,7 @@ impl Camera for Trackball {
 							canvas.hide_cursor(true);
 							canvas.set_cursor_grab(true);
 							if let Some((pitch, yaw, yaw_axis)) = self.first.compute(&vec, &max) {
-								self.frame.look_around(pitch, yaw, &yaw_axis);
+								self.frame.look_around(pitch, yaw, yaw_axis);
 							}
 						}
 						if pos.y <= 0.0 {
