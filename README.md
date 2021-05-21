@@ -2,17 +2,17 @@
 
 Virtual Trackball Camera Mode for Kiss3D
 
+[![Matrix][]](https://matrix.to/#/!aKshXqmXyJHMgglnJd:qu1x.one?via=qu1x.one)
 [![Build Status][]](https://travis-ci.org/qu1x/kiss3d-trackball)
 [![Downloads][]](https://crates.io/crates/kiss3d-trackball)
-[![Recent Downloads][]](https://crates.io/crates/kiss3d-trackball)
 [![Rust][]](https://www.rust-lang.org)
 [![Version][]](https://crates.io/crates/kiss3d-trackball)
 [![Documentation][]](https://doc.qu1x.dev/kiss3d-trackball)
 [![License][]](https://spdx.org/licenses/BSD-2-Clause-Patent.html)
 
+[Matrix]: https://img.shields.io/matrix/trackball:qu1x.one?server_fqdn=matrix.qu1x.one
 [Build Status]: https://travis-ci.org/qu1x/kiss3d-trackball.svg
 [Downloads]: https://img.shields.io/crates/d/kiss3d-trackball.svg
-[Recent Downloads]: https://img.shields.io/crates/dr/kiss3d-trackball.svg
 [Rust]: https://img.shields.io/badge/rust-stable-brightgreen.svg
 [Version]: https://img.shields.io/crates/v/kiss3d-trackball.svg
 [Documentation]: https://docs.rs/kiss3d-trackball/badge.svg
