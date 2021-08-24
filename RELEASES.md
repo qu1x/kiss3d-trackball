@@ -1,3 +1,8 @@
+# Version 0.3.1 (2021-08-24)
+
+  * Prepare for latest `nalgebra`.
+  * Make crate `no_std`.
+
 # Version 0.3.0 (2021-04-28)
 
   * Add first person view.
