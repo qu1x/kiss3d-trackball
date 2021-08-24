@@ -4,7 +4,7 @@ use nalgebra::RealField;
 
 /// Input keys/buttons and their modifiers.
 #[derive(Debug, Clone)]
-pub struct Input<N: RealField> {
+pub struct Input<N: Copy + RealField> {
 	phantom_data: PhantomData<N>,
 	first_key: Option<Key>,
 	ortho_key: Option<Key>,
@@ -15,7 +15,7 @@ pub struct Input<N: RealField> {
 	slide_modifiers: Option<Modifiers>,
 }
 
-impl<N: RealField> Default for Input<N> {
+impl<N: Copy + RealField> Default for Input<N> {
 	fn default() -> Self {
 		Self {
 			phantom_data: PhantomData,
@@ -30,7 +30,7 @@ impl<N: RealField> Default for Input<N> {
 	}
 }
 
-impl<N: RealField> Input<N> {
+impl<N: Copy + RealField> Input<N> {
 	/// Key used to enable first person view as long as being pressed.
 	pub fn first_key(&self) -> Option<Key> {
 		self.first_key
