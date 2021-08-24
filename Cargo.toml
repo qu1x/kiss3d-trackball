@@ -16,6 +16,7 @@ keywords = [
 	"camera",
 ]
 categories = [
+	"no-std",
 	"graphics",
 ]
 include = [
@@ -31,8 +32,8 @@ travis-ci = { repository = "qu1x/kiss3d-trackball" }
 
 [dependencies]
 kiss3d = "0.31"
-nalgebra = "0.26"
-trackball = "0.5"
+nalgebra = { version = "0.26", default-features = false, features = ["libm"] }
+trackball = "0.6"
 
 [features]
 cc = ["trackball/cc"]

@@ -4,6 +4,7 @@
 //! in a compound [`Trackball`] [`Camera`] mode implementation for the [`kiss3d`] graphics library.
 
 #![allow(clippy::collapsible_else_if)]
+#![no_std]
 
 use kiss3d::{
 	camera::Camera,
