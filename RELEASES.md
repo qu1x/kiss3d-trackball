@@ -1,3 +1,8 @@
+# Version 0.4.0 (2021-11-12)
+
+  * Bump `kiss3d`, `trackball`, and `nalgebra` to latest versions.
+  * Use latest edition.
+
 # Version 0.3.1 (2021-08-24)
 
   * Prepare for latest `nalgebra`.
