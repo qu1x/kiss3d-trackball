@@ -1,4 +1,4 @@
-//! Virtual Trackball Camera Mode for Kiss3D
+//! Virtual Trackball Camera Mode for Kiss 3D
 //!
 //! Complements common [`trackball`] operation handlers with [`kiss3d`]-specific [`Input`] resulting
 //! in a compound [`Trackball`] [`Camera`] mode implementation for the [`kiss3d`] graphics library.
@@ -8,7 +8,7 @@
 
 use kiss3d::{
 	camera::Camera,
-	event::{Action, TouchAction, WindowEvent},
+	event::{Action, Key, Modifiers, MouseButton, TouchAction, WindowEvent},
 	resource::ShaderUniform,
 	window::Canvas,
 };
@@ -83,24 +83,25 @@ impl Trackball {
 	/// planes at 1E-1 and 1E+6.
 	///
 	/// **Note:** Argument order differs from cameras in [`kiss3d::camera`].
+	#[must_use]
 	pub fn new(target: Point3<f32>, eye: &Point3<f32>, up: &Vector3<f32>) -> Trackball {
 		let frame = Frame::look_at(target, eye, up);
 		let reset = frame.clone();
 		let scene = Scene::default();
 		let image = Image::new(&frame, &scene, Point2::new(800.0, 600.0));
 		Self {
-			input: Default::default(),
-			clamp: Default::default(),
-			first: Default::default(),
+			input: Input::default(),
+			clamp: Clamp::default(),
+			first: First::default(),
 			frame,
 			reset,
 			scene,
 			image,
-			orbit: Default::default(),
-			scale: Default::default(),
-			slide: Default::default(),
-			touch: Default::default(),
-			mouse: Default::default(),
+			orbit: Orbit::default(),
+			scale: Scale::default(),
+			slide: Slide::default(),
+			touch: Touch::default(),
+			mouse: Option::default(),
 		}
 	}
 	/// Like [`Self::new()`] but with custom viewing frustum.
@@ -122,6 +123,191 @@ impl Trackball {
 		trackball.scene.set_clip_planes(znear, zfar);
 		trackball
 	}
+	fn handle_touch(
+		&mut self,
+		_canvas: &Canvas,
+		id: u64,
+		x: f64,
+		y: f64,
+		action: TouchAction,
+		_modifiers: Modifiers,
+	) {
+		#[allow(clippy::cast_possible_truncation)]
+		let pos = Point2::new(x as f32, y as f32);
+		match action {
+			TouchAction::Start | TouchAction::Move => {
+				if action == TouchAction::Start {
+					self.slide.discard();
+				}
+				if let Some((num, pos, rot, rat)) = self.touch.compute(Some(id), pos, 0) {
+					if self.first.enabled() {
+						if let Some(vec) = self.slide.compute(pos) {
+							if let Some((pitch, yaw, yaw_axis)) =
+								self.first.compute(&vec, self.image.max())
+							{
+								self.frame.look_around(pitch, yaw, yaw_axis);
+							}
+						}
+					} else {
+						if num == 1 {
+							if let Some(rot) = self.orbit.compute(&pos, self.image.max()) {
+								self.frame.local_orbit(&rot);
+							}
+						} else {
+							if let Some(vec) = self.slide.compute(pos) {
+								self.frame.local_slide(&self.image.project_vec(&vec));
+							}
+							if num == 2 {
+								let pos = self.image.project_pos(&pos);
+								let rot = UnitQuaternion::from_axis_angle(
+									&self.frame.local_roll_axis(),
+									rot,
+								);
+								self.frame.local_orbit_around(&rot, &pos);
+								self.frame.local_scale_around(rat, &pos);
+							}
+						}
+					}
+				}
+			}
+			TouchAction::End | TouchAction::Cancel => {
+				if let Some((_num, pos)) = self.touch.discard(Some(id)) {
+					self.frame.local_slide(&self.image.project_pos(&pos).coords);
+				}
+				self.orbit.discard();
+				self.slide.discard();
+			}
+		}
+	}
+	fn handle_mouse_button(
+		&mut self,
+		_canvas: &Canvas,
+		button: MouseButton,
+		action: Action,
+		_modifiers: Modifiers,
+	) {
+		if !self.first.enabled() {
+			if Some(button) == self.input.orbit_button() {
+				if action == Action::Press {
+					self.touch.compute(None, *self.image.pos(), 0);
+				} else {
+					self.orbit.discard();
+					if let Some((_num, pos)) = self.touch.discard(None) {
+						self.frame.local_slide(&self.image.project_pos(&pos).coords);
+					}
+				}
+			}
+			if Some(button) == self.input.slide_button() {
+				if action == Action::Press {
+					self.slide.compute(*self.image.pos());
+				} else {
+					self.slide.discard();
+				}
+			}
+		}
+	}
+	fn handle_cursor_pos(&mut self, canvas: &Canvas, x: f64, y: f64, modifiers: Modifiers) {
+		let pos = Point2::new(x, y);
+		let is_eq = |old| old == pos || old == Point2::new(pos.x.floor(), pos.y.floor());
+		if self.mouse.replace(pos).map_or(true, is_eq) {
+			return;
+		}
+		let (pos, max) = (pos.cast(), *self.image.max());
+		if self.first.enabled() {
+			if self.touch.fingers() == 0 {
+				if let Some(vec) = self.slide.compute(pos) {
+					canvas.hide_cursor(true);
+					canvas.set_cursor_grab(true);
+					if let Some((pitch, yaw, yaw_axis)) = self.first.compute(&vec, &max) {
+						self.frame.look_around(pitch, yaw, yaw_axis);
+					}
+				}
+				if pos.y <= 0.0 {
+					canvas.set_cursor_position(x, f64::from(max.y) - 2.0);
+					self.slide.discard();
+				}
+				if pos.x <= 0.0 {
+					canvas.set_cursor_position(f64::from(max.x) - 2.0, y);
+					self.slide.discard();
+				}
+				if pos.x >= max.x - 1.0 {
+					canvas.set_cursor_position(1.0, y);
+					self.slide.discard();
+				}
+				if pos.y >= max.y - 1.0 {
+					canvas.set_cursor_position(x, 1.0);
+					self.slide.discard();
+				}
+			}
+		} else {
+			self.image.set_pos(pos);
+			let orbit = self.input.orbit_button().map_or(false, |button| {
+				canvas.get_mouse_button(button) == Action::Press
+					&& self
+						.input
+						.orbit_modifiers()
+						.map_or(true, |m| m == modifiers)
+			});
+			let slide = self.input.slide_button().map_or(false, |button| {
+				canvas.get_mouse_button(button) == Action::Press
+					&& self
+						.input
+						.slide_modifiers()
+						.map_or(true, |m| m == modifiers)
+			});
+			if orbit && slide {
+				self.orbit.discard();
+				self.slide.discard();
+			}
+			if orbit {
+				if let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1) {
+					if let Some(rot) = self.orbit.compute(&pos, &max) {
+						self.frame.local_orbit(&rot);
+					}
+				}
+			}
+			if slide {
+				if let Some(vec) = self.slide.compute(pos) {
+					self.frame.local_slide(&self.image.project_vec(&vec));
+				}
+			}
+		}
+	}
+	fn handle_scroll(&mut self, _canvas: &Canvas, _dx: f64, dy: f64, _modifiers: Modifiers) {
+		self.frame.local_scale_around(
+			#[allow(clippy::cast_possible_truncation)]
+			self.scale.compute(dy as f32),
+			&self.image.project_pos(self.image.pos()),
+		);
+	}
+	fn handle_key(&mut self, canvas: &Canvas, key: Key, action: Action, _modifiers: Modifiers) {
+		if Some(key) == self.input.first_key() {
+			let mid = self.image.max() * 0.5;
+			if action == Action::Press {
+				if !self.first.enabled() {
+					self.first.capture(self.frame.yaw_axis());
+					self.image.set_pos(mid);
+				}
+			} else {
+				self.slide.discard();
+				self.first.discard();
+				if self.touch.fingers() == 0 {
+					canvas.set_cursor_position(mid.x.into(), mid.y.into());
+					canvas.hide_cursor(false);
+					canvas.set_cursor_grab(false);
+				}
+			}
+		} else if action == Action::Press {
+			if Some(key) == self.input.ortho_key() {
+				self.scene.set_ortho(!self.scene.ortho());
+			} else if Some(key) == self.input.reset_key() {
+				self.frame = self.reset.clone();
+			}
+		}
+	}
+	fn handle_framebuffer_size(&mut self, _canvas: &Canvas, w: u32, h: u32) {
+		self.image.set_max(Point2::new(w, h).cast());
+	}
 }
 
 impl Camera for Trackball {
@@ -136,176 +322,23 @@ impl Camera for Trackball {
 	}
 	fn handle_event(&mut self, canvas: &Canvas, event: &WindowEvent) {
 		match *event {
-			WindowEvent::Touch(id, x, y, action, _modifiers) => {
-				let pos = Point2::new(x as f32, y as f32);
-				match action {
-					TouchAction::Start | TouchAction::Move => {
-						if action == TouchAction::Start {
-							self.slide.discard();
-						}
-						if let Some((num, pos, rot, rat)) = self.touch.compute(Some(id), pos, 0) {
-							if self.first.enabled() {
-								if let Some(vec) = self.slide.compute(pos) {
-									if let Some((pitch, yaw, yaw_axis)) =
-										self.first.compute(&vec, self.image.max())
-									{
-										self.frame.look_around(pitch, yaw, yaw_axis);
-									}
-								}
-							} else {
-								if num == 1 {
-									if let Some(rot) = self.orbit.compute(&pos, self.image.max()) {
-										self.frame.local_orbit(&rot);
-									}
-								} else {
-									if let Some(vec) = self.slide.compute(pos) {
-										self.frame.local_slide(&self.image.project_vec(&vec));
-									}
-									if num == 2 {
-										let pos = self.image.project_pos(&pos);
-										let rot = UnitQuaternion::from_axis_angle(
-											&self.frame.local_roll_axis(),
-											rot,
-										);
-										self.frame.local_orbit_around(&rot, &pos);
-										self.frame.local_scale_around(rat, &pos);
-									}
-								}
-							}
-						}
-					}
-					TouchAction::End | TouchAction::Cancel => {
-						if let Some((_num, pos)) = self.touch.discard(Some(id)) {
-							self.frame.local_slide(&self.image.project_pos(&pos).coords);
-						}
-						self.orbit.discard();
-						self.slide.discard();
-					}
-				}
+			WindowEvent::Touch(id, x, y, action, modifiers) => {
+				self.handle_touch(canvas, id, x, y, action, modifiers);
 			}
-			WindowEvent::MouseButton(button, action, _modifiers) if !self.first.enabled() => {
-				if Some(button) == self.input.orbit_button() {
-					if action == Action::Press {
-						self.touch.compute(None, *self.image.pos(), 0);
-					} else {
-						self.orbit.discard();
-						if let Some((_num, pos)) = self.touch.discard(None) {
-							self.frame.local_slide(&self.image.project_pos(&pos).coords);
-						}
-					}
-				}
-				if Some(button) == self.input.slide_button() {
-					if action == Action::Press {
-						self.slide.compute(*self.image.pos());
-					} else {
-						self.slide.discard();
-					}
-				}
+			WindowEvent::MouseButton(button, action, modifiers) => {
+				self.handle_mouse_button(canvas, button, action, modifiers);
 			}
 			WindowEvent::CursorPos(x, y, modifiers) => {
-				let pos = Point2::new(x, y);
-				let is_eq = |old| old == pos || old == Point2::new(pos.x.floor(), pos.y.floor());
-				if self.mouse.replace(pos).map_or(true, is_eq) {
-					return;
-				}
-				let (pos, max) = (pos.cast(), *self.image.max());
-				if self.first.enabled() {
-					if self.touch.fingers() == 0 {
-						if let Some(vec) = self.slide.compute(pos) {
-							canvas.hide_cursor(true);
-							canvas.set_cursor_grab(true);
-							if let Some((pitch, yaw, yaw_axis)) = self.first.compute(&vec, &max) {
-								self.frame.look_around(pitch, yaw, yaw_axis);
-							}
-						}
-						if pos.y <= 0.0 {
-							canvas.set_cursor_position(x, max.y as f64 - 2.0);
-							self.slide.discard();
-						}
-						if pos.x <= 0.0 {
-							canvas.set_cursor_position(max.x as f64 - 2.0, y);
-							self.slide.discard();
-						}
-						if pos.x >= max.x - 1.0 {
-							canvas.set_cursor_position(1.0, y);
-							self.slide.discard();
-						}
-						if pos.y >= max.y - 1.0 {
-							canvas.set_cursor_position(x, 1.0);
-							self.slide.discard();
-						}
-					}
-				} else {
-					self.image.set_pos(pos);
-					let orbit = self.input.orbit_button().map_or(false, |button| {
-						canvas.get_mouse_button(button) == Action::Press
-							&& self
-								.input
-								.orbit_modifiers()
-								.map(|m| m == modifiers)
-								.unwrap_or(true)
-					});
-					let slide = self.input.slide_button().map_or(false, |button| {
-						canvas.get_mouse_button(button) == Action::Press
-							&& self
-								.input
-								.slide_modifiers()
-								.map(|m| m == modifiers)
-								.unwrap_or(true)
-					});
-					if orbit && slide {
-						self.orbit.discard();
-						self.slide.discard();
-					}
-					if orbit {
-						if let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1) {
-							if let Some(rot) = self.orbit.compute(&pos, &max) {
-								self.frame.local_orbit(&rot);
-							}
-						}
-					}
-					if slide {
-						if let Some(vec) = self.slide.compute(pos) {
-							self.frame.local_slide(&self.image.project_vec(&vec));
-						}
-					}
-				}
+				self.handle_cursor_pos(canvas, x, y, modifiers);
 			}
-			WindowEvent::Scroll(_, val, _) => {
-				self.frame.local_scale_around(
-					self.scale.compute(val as f32),
-					&self.image.project_pos(self.image.pos()),
-				);
+			WindowEvent::Scroll(dx, dy, modifiers) => {
+				self.handle_scroll(canvas, dx, dy, modifiers);
 			}
-			WindowEvent::Key(key, action, _modifiers) if Some(key) == self.input.first_key() => {
-				let mid = self.image.max() * 0.5;
-				if action == Action::Press {
-					if !self.first.enabled() {
-						self.first.capture(self.frame.yaw_axis());
-						self.image.set_pos(mid);
-					}
-				} else {
-					self.slide.discard();
-					self.first.discard();
-					if self.touch.fingers() == 0 {
-						canvas.set_cursor_position(mid.x as f64, mid.y as f64);
-						canvas.hide_cursor(false);
-						canvas.set_cursor_grab(false);
-					}
-				}
-			}
-			WindowEvent::Key(key, Action::Press, _modifiers)
-				if Some(key) == self.input.ortho_key() =>
-			{
-				self.scene.set_ortho(!self.scene.ortho());
-			}
-			WindowEvent::Key(key, Action::Press, _modifiers)
-				if Some(key) == self.input.reset_key() =>
-			{
-				self.frame = self.reset.clone();
+			WindowEvent::Key(key, action, modifiers) => {
+				self.handle_key(canvas, key, action, modifiers);
 			}
 			WindowEvent::FramebufferSize(w, h) => {
-				self.image.set_max(Point2::new(w, h).cast());
+				self.handle_framebuffer_size(canvas, w, h);
 			}
 			_ => {}
 		}

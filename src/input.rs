@@ -32,6 +32,7 @@ impl<N: Copy + RealField> Default for Input<N> {
 
 impl<N: Copy + RealField> Input<N> {
 	/// Key used to enable first person view as long as being pressed.
+	#[must_use]
 	pub fn first_key(&self) -> Option<Key> {
 		self.first_key
 	}
@@ -42,6 +43,7 @@ impl<N: Copy + RealField> Input<N> {
 		self.first_key = key;
 	}
 	/// Key used to switch between orthographic and perspective projection.
+	#[must_use]
 	pub fn ortho_key(&self) -> Option<Key> {
 		self.ortho_key
 	}
@@ -52,6 +54,7 @@ impl<N: Copy + RealField> Input<N> {
 		self.ortho_key = key;
 	}
 	/// Key used to reset camera.
+	#[must_use]
 	pub fn reset_key(&self) -> Option<Key> {
 		self.reset_key
 	}
@@ -62,6 +65,7 @@ impl<N: Copy + RealField> Input<N> {
 		self.reset_key = key;
 	}
 	/// Button used to orbit camera.
+	#[must_use]
 	pub fn orbit_button(&self) -> Option<MouseButton> {
 		self.orbit_button
 	}
@@ -72,6 +76,7 @@ impl<N: Copy + RealField> Input<N> {
 		self.orbit_button = button;
 	}
 	/// Modifiers that must be pressed for orbit to occur.
+	#[must_use]
 	pub fn orbit_modifiers(&self) -> Option<Modifiers> {
 		self.orbit_modifiers
 	}
@@ -82,9 +87,10 @@ impl<N: Copy + RealField> Input<N> {
 	///     is pressed. In particular, if set to `Some(Modifiers::empty())`, orbit will occur only
 	///     if no modifier is pressed.
 	pub fn set_orbit_modifiers(&mut self, modifiers: Option<Modifiers>) {
-		self.orbit_modifiers = modifiers
+		self.orbit_modifiers = modifiers;
 	}
 	/// Button used to slide camera.
+	#[must_use]
 	pub fn slide_button(&self) -> Option<MouseButton> {
 		self.slide_button
 	}
@@ -95,6 +101,7 @@ impl<N: Copy + RealField> Input<N> {
 		self.slide_button = button;
 	}
 	/// Modifiers that must be pressed for slide to occur.
+	#[must_use]
 	pub fn slide_modifiers(&self) -> Option<Modifiers> {
 		self.slide_modifiers
 	}
@@ -105,6 +112,6 @@ impl<N: Copy + RealField> Input<N> {
 	///     is pressed. In particular, if set to `Some(Modifiers::empty())`, slide will occur only
 	///     if no modifier is pressed.
 	pub fn set_slide_modifiers(&mut self, modifiers: Option<Modifiers>) {
-		self.slide_modifiers = modifiers
+		self.slide_modifiers = modifiers;
 	}
 }

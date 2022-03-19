@@ -1,6 +1,6 @@
 # kiss3d-trackball
 
-Virtual Trackball Camera Mode for Kiss3D
+Virtual Trackball Camera Mode for Kiss 3D
 
 [![Build Status][]](https://travis-ci.org/qu1x/kiss3d-trackball)
 [![Downloads][]](https://crates.io/crates/kiss3d-trackball)
