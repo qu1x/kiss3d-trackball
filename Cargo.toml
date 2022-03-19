@@ -1,6 +1,6 @@
 [package]
 name = "kiss3d-trackball"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Rouven Spreckels <rs@qu1x.dev>"]
 edition = "2021"
 description = "Virtual Trackball Camera Mode for Kiss3D"
@@ -31,9 +31,9 @@ include = [
 travis-ci = { repository = "qu1x/kiss3d-trackball" }
 
 [dependencies]
-kiss3d = "0.32"
-nalgebra = { version = "0.29", default-features = false, features = ["libm"] }
-trackball = "0.7"
+kiss3d = "0.34"
+nalgebra = { version = "0.30", default-features = false, features = ["libm"] }
+trackball = "0.8"
 
 [features]
 cc = ["trackball/cc"]

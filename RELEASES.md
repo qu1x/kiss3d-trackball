@@ -1,3 +1,8 @@
+# Version 0.5.0 (2022-03-19)
+
+  * Bump `kiss3d`, `trackball`, and `nalgebra` to latest versions.
+  * Adhere to pedantic Clippy lints.
+
 # Version 0.4.0 (2021-11-12)
 
   * Bump `kiss3d`, `trackball`, and `nalgebra` to latest versions.
