@@ -3,7 +3,7 @@
 Virtual Trackball Camera Mode for Kiss 3D
 
 [![Build][]](https://github.com/qu1x/kiss3d-trackball/actions/workflows/build.yml)
-[![Documentation][]](https://doc.qu1x.dev/kiss3d-trackball)
+[![Documentation][]](https://docs.rs/kiss3d-trackball)
 [![Downloads][]](https://crates.io/crates/kiss3d-trackball)
 [![Version][]](https://crates.io/crates/kiss3d-trackball)
 [![Rust][]](https://www.rust-lang.org)
