@@ -24,8 +24,8 @@ See the [release history](RELEASES.md) to keep track of the development.
 [trackball library]: https://github.com/qu1x/trackball
 [Kiss3D graphics library]: https://github.com/sebcrozet/kiss3d
 
-[`Input`]: https://doc.qu1x.dev/kiss3d-trackball/kiss3d_trackball/struct.Input.html
-[`Trackball`]: https://doc.qu1x.dev/kiss3d-trackball/kiss3d_trackball/struct.Trackball.html
+[`Input`]: https://docs.rs/kiss3d-trackball/latest/kiss3d_trackball/struct.Input.html
+[`Trackball`]: https://docs.rs/kiss3d-trackball/latest/kiss3d_trackball/struct.Trackball.html
 
 ## License
 
