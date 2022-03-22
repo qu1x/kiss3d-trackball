@@ -9,16 +9,17 @@
 use kiss3d::{
 	camera::Camera,
 	event::{Action, Key, Modifiers, MouseButton, TouchAction, WindowEvent},
+	nalgebra::{Isometry3, Matrix4, Point2, Point3, UnitQuaternion, Vector3},
 	resource::ShaderUniform,
 	window::Canvas,
 };
-use nalgebra::{Isometry3, Matrix4, Point2, Point3, UnitQuaternion, Vector3};
-use trackball::{Clamp, First, Frame, Image, Orbit, Scale, Scene, Slide, Touch};
+use trackball::{Clamp, First, Fixed, Frame, Image, Orbit, Scale, Scene, Slide, Touch};
+
+pub use kiss3d;
+pub use trackball;
 
 mod input;
 pub use input::*;
-
-pub use trackball::Fixed;
 
 /// Trackball camera mode.
 ///

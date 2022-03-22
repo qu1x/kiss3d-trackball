@@ -32,7 +32,6 @@ travis-ci = { repository = "qu1x/kiss3d-trackball" }
 
 [dependencies]
 kiss3d = "0.34"
-nalgebra = { version = "0.30", default-features = false, features = ["libm"] }
 trackball = "0.8"
 
 [features]

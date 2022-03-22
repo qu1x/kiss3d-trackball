@@ -1,6 +1,8 @@
 use core::marker::PhantomData;
-use kiss3d::event::{Key, Modifiers, MouseButton};
-use nalgebra::RealField;
+use kiss3d::{
+	event::{Key, Modifiers, MouseButton},
+	nalgebra::RealField,
+};
 
 /// Input keys/buttons and their modifiers.
 #[derive(Debug, Clone)]
