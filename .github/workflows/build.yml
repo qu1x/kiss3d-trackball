@@ -1,0 +1,60 @@
+name: build
+on:
+  schedule:
+  - cron: '0 5 * * *'
+  push:
+  pull_request:
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  default:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - name: test
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+    - name: clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- --deny clippy::pedantic
+    - name: doc
+      uses: actions-rs/cargo@v1
+      with:
+        command: doc
+    - name: fmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --check
+  cc:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - name: test
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --features cc
+    - name: clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: --features cc -- --deny clippy::pedantic
+    - name: doc
+      uses: actions-rs/cargo@v1
+      with:
+        command: doc
+        args: --features cc

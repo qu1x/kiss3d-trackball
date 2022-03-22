@@ -27,9 +27,6 @@ include = [
 	"LICENSES/*.md",
 ]
 
-[badges]
-travis-ci = { repository = "qu1x/kiss3d-trackball" }
-
 [dependencies]
 kiss3d = "0.34"
 trackball = "0.8"

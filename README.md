@@ -2,18 +2,18 @@
 
 Virtual Trackball Camera Mode for Kiss 3D
 
-[![Build Status][]](https://travis-ci.org/qu1x/kiss3d-trackball)
-[![Downloads][]](https://crates.io/crates/kiss3d-trackball)
-[![Rust][]](https://www.rust-lang.org)
-[![Version][]](https://crates.io/crates/kiss3d-trackball)
+[![Build][]](https://github.com/qu1x/kiss3d-trackball/actions/workflows/build.yml)
 [![Documentation][]](https://doc.qu1x.dev/kiss3d-trackball)
+[![Downloads][]](https://crates.io/crates/kiss3d-trackball)
+[![Version][]](https://crates.io/crates/kiss3d-trackball)
+[![Rust][]](https://www.rust-lang.org)
 [![License][]](https://spdx.org/licenses/BSD-2-Clause-Patent.html)
 
-[Build Status]: https://travis-ci.org/qu1x/kiss3d-trackball.svg
-[Downloads]: https://img.shields.io/crates/d/kiss3d-trackball.svg
-[Rust]: https://img.shields.io/badge/rust-stable-brightgreen.svg
-[Version]: https://img.shields.io/crates/v/kiss3d-trackball.svg
+[Build]: https://github.com/qu1x/kiss3d-trackball/actions/workflows/build.yml/badge.svg
 [Documentation]: https://docs.rs/kiss3d-trackball/badge.svg
+[Downloads]: https://img.shields.io/crates/d/kiss3d-trackball.svg
+[Version]: https://img.shields.io/crates/v/kiss3d-trackball.svg
+[Rust]: https://img.shields.io/badge/rust-stable-brightgreen.svg
 [License]: https://img.shields.io/crates/l/kiss3d-trackball.svg
 
 Complements the [trackball library] with Kiss3D-specific [`Input`] resulting in a compound
