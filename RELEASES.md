@@ -1,3 +1,7 @@
+# Version 0.6.0 (2022-03-22)
+
+  * Re-export `kiss3d` and `trackball` moving `Fixed` to `trackball::Fixed`.
+
 # Version 0.5.0 (2022-03-19)
 
   * Bump `kiss3d`, `trackball`, and `nalgebra` to latest versions.
