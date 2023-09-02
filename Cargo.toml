@@ -1,6 +1,6 @@
 [package]
 name = "kiss3d-trackball"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Rouven Spreckels <rs@qu1x.dev>"]
 edition = "2021"
 description = "Virtual Trackball Camera Mode for Kiss3D"
@@ -26,6 +26,9 @@ include = [
 	"RELEASES.md",
 	"LICENSES/*.md",
 ]
+
+[badges]
+maintenance = { status = "deprecated" }
 
 [dependencies]
 kiss3d = "0.34"

@@ -2,6 +2,10 @@
 
 Virtual Trackball Camera Mode for Kiss 3D
 
+**Warning**: Deprecated in favor of [`bevy_trackball`].
+
+[`bevy_trackball`]: https://qu1x.github.io/bevy_trackball
+
 [![Build][]](https://github.com/qu1x/kiss3d-trackball/actions/workflows/build.yml)
 [![Documentation][]](https://docs.rs/kiss3d-trackball)
 [![Downloads][]](https://crates.io/crates/kiss3d-trackball)

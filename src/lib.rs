@@ -1,5 +1,9 @@
 //! Virtual Trackball Camera Mode for Kiss 3D
 //!
+//! **Warning**: Deprecated in favor of [`bevy_trackball`].
+//!
+//! [`bevy_trackball`]: https://qu1x.github.io/bevy_trackball
+//!
 //! Complements common [`trackball`] operation handlers with [`kiss3d`]-specific [`Input`] resulting
 //! in a compound [`Trackball`] [`Camera`] mode implementation for the [`kiss3d`] graphics library.
 

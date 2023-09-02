@@ -1,3 +1,9 @@
+# Version 0.6.1 (2023-09-02)
+
+  * Deprecate in favor of [`bevy_trackball`].
+
+    [`bevy_trackball`]: https://qu1x.github.io/bevy_trackball
+
 # Version 0.6.0 (2022-03-22)
 
   * Re-export `kiss3d` and `trackball` moving `Fixed` to `trackball::Fixed`.
