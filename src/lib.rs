@@ -158,11 +158,12 @@ impl Trackball {
 				}
 				if let Some((num, pos, rot, rat)) = self.touch.compute(Some(id), pos, 0) {
 					if self.first.enabled() {
-						if let Some(vec) = self.slide.compute(pos)
-							&& let Some((pitch, yaw, yaw_axis)) =
+						if let Some(vec) = self.slide.compute(pos) {
+							if let Some((pitch, yaw, yaw_axis)) =
 								self.first.compute(&vec, self.image.max())
-						{
-							self.frame.look_around(pitch, yaw, yaw_axis);
+							{
+								self.frame.look_around(pitch, yaw, yaw_axis);
+							}
 						}
 					} else {
 						if num == 1 {
@@ -269,14 +270,17 @@ impl Trackball {
 				self.orbit.discard();
 				self.slide.discard();
 			}
-			if orbit
-				&& let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1)
-				&& let Some(rot) = self.orbit.compute(&pos, &max)
-			{
-				self.frame.local_orbit(&rot);
+			if orbit {
+				if let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1) {
+					if let Some(rot) = self.orbit.compute(&pos, &max) {
+						self.frame.local_orbit(&rot);
+					}
+				}
 			}
-			if slide && let Some(vec) = self.slide.compute(pos) {
-				self.frame.local_slide(&self.image.project_vec(&vec));
+			if slide {
+				if let Some(vec) = self.slide.compute(pos) {
+					self.frame.local_slide(&self.image.project_vec(&vec));
+				}
 			}
 		}
 	}
