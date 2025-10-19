@@ -1,8 +1,9 @@
 [package]
 name = "kiss3d-trackball"
 version = "0.7.0"
-authors = ["Rouven Spreckels <rs@qu1x.dev>"]
+rust-version = "1.87.0"
 edition = "2024"
+authors = ["Rouven Spreckels <rs@qu1x.dev>"]
 description = "Coherent Virtual Trackball Camera Mode for Kiss 3D"
 documentation = "https://docs.rs/kiss3d-trackball"
 repository = "https://github.com/qu1x/kiss3d-trackball"
