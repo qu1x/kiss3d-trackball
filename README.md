@@ -47,7 +47,7 @@ See the [release history](RELEASES.md) to keep track of the development.
 
 ## License
 
-The works are [licensed](LICENSES/BSD-2-Clause-Patent.md) under the [`BSD-2-Clause-Patent`].
+The works are [licensed](LICENSE-BSD) under the [`BSD-2-Clause-Patent`].
 
 This license is designed to provide:
 
