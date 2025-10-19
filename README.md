@@ -13,7 +13,7 @@ Coherent Virtual Trackball Camera Mode for Kiss 3D
 [Documentation]: https://docs.rs/kiss3d-trackball/badge.svg
 [Downloads]: https://img.shields.io/crates/d/kiss3d-trackball.svg
 [Version]: https://img.shields.io/crates/v/kiss3d-trackball.svg
-[Rust]: https://img.shields.io/badge/rust-stable-brightgreen.svg
+[Rust]: https://img.shields.io/badge/rust-v1.87.0-brightgreen.svg
 [License]: https://img.shields.io/crates/l/kiss3d-trackball.svg
 
 Complements the [trackball library] with Kiss3D-specific [`Input`] resulting in a compound
