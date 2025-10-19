@@ -1,10 +1,6 @@
 # kiss3d-trackball
 
-Virtual Trackball Camera Mode for Kiss 3D
-
-**Warning**: Deprecated in favor of [`bevy_trackball`].
-
-[`bevy_trackball`]: https://qu1x.github.io/bevy_trackball
+Coherent Virtual Trackball Camera Mode for Kiss 3D
 
 [![Build][]](https://github.com/qu1x/kiss3d-trackball/actions/workflows/build.yml)
 [![Documentation][]](https://docs.rs/kiss3d-trackball)
@@ -22,6 +18,24 @@ Virtual Trackball Camera Mode for Kiss 3D
 
 Complements the [trackball library] with Kiss3D-specific [`Input`] resulting in a compound
 [`Trackball`] camera mode implementation for the [Kiss3D graphics library].
+
+## Coherence
+
+This is an alternative trackball technique using exponential map and parallel transport to
+preserve distances and angles for inducing coherent and intuitive trackball rotations. For
+instance, displacements on straight radial lines through the screen's center are carried to arcs
+of the same length on great circles of the trackball (e.g., dragging the mouse along an eights
+of the trackball's circumference rolls the camera by 360/8=45 degrees, dragging the mouse from
+the screen's center to its further edge *linearly* rotates the camera by 1 [radian], where the
+trackball's diameter is the maximum of the screen's width and height). This is in contrast to
+state-of-the-art techniques using orthogonal projection which distorts radial distances further
+away from the screen's center (e.g., the rotation accelerates towards the edge).[^1]
+
+[^1]: G. Stantchev, “Virtual Trackball Modeling and the Exponential Map”, [S2CID 44199608 (2004)
+](https://api.semanticscholar.org/CorpusID:44199608), [Archived PDF
+](https://web.archive.org/web/2/http://www.math.umd.edu:80/~gogo/Papers/trackballExp.pdf)
+
+[radian]: https://en.wikipedia.org/wiki/Radian
 
 See the [release history](RELEASES.md) to keep track of the development.
 

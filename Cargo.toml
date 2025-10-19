@@ -1,9 +1,9 @@
 [package]
 name = "kiss3d-trackball"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Rouven Spreckels <rs@qu1x.dev>"]
-edition = "2021"
-description = "Virtual Trackball Camera Mode for Kiss3D"
+edition = "2024"
+description = "Coherent Virtual Trackball Camera Mode for Kiss 3D"
 documentation = "https://docs.rs/kiss3d-trackball"
 repository = "https://github.com/qu1x/kiss3d-trackball"
 readme = "README.md"
@@ -21,18 +21,16 @@ categories = [
 ]
 include = [
 	"src/**/*.rs",
+	"examples/**/*.rs",
 	"Cargo.toml",
 	"README.md",
 	"RELEASES.md",
-	"LICENSES/*.md",
+	"LICENSE-BSD",
 ]
 
-[badges]
-maintenance = { status = "deprecated" }
-
 [dependencies]
-kiss3d = "0.34"
-trackball = "0.8"
+kiss3d = "0.37.0"
+trackball = "0.17.1"
 
 [features]
 cc = ["trackball/cc"]

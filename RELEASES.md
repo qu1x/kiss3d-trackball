@@ -1,3 +1,7 @@
+# Version 0.7.0 (2025-10-19)
+
+  * Revive by bumping `kiss3d`, `trackball`, and `nalgebra` to latest versions.
+
 # Version 0.6.1 (2023-09-02)
 
   * Deprecate in favor of [`bevy_trackball`].

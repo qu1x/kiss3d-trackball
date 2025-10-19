@@ -1,11 +1,25 @@
-//! Virtual Trackball Camera Mode for Kiss 3D
-//!
-//! **Warning**: Deprecated in favor of [`bevy_trackball`].
-//!
-//! [`bevy_trackball`]: https://qu1x.github.io/bevy_trackball
+//! Coherent Virtual Trackball Camera Mode for Kiss 3D
 //!
 //! Complements common [`trackball`] operation handlers with [`kiss3d`]-specific [`Input`] resulting
 //! in a compound [`Trackball`] [`Camera`] mode implementation for the [`kiss3d`] graphics library.
+//!
+//! # Coherence
+//!
+//! This is an alternative trackball technique using exponential map and parallel transport to
+//! preserve distances and angles for inducing coherent and intuitive trackball rotations. For
+//! instance, displacements on straight radial lines through the screen's center are carried to arcs
+//! of the same length on great circles of the trackball (e.g., dragging the mouse along an eights
+//! of the trackball's circumference rolls the camera by 360/8=45 degrees, dragging the mouse from
+//! the screen's center to its further edge *linearly* rotates the camera by 1 [radian], where the
+//! trackball's diameter is the maximum of the screen's width and height). This is in contrast to
+//! state-of-the-art techniques using orthogonal projection which distorts radial distances further
+//! away from the screen's center (e.g., the rotation accelerates towards the edge).[^1]
+//!
+//! [^1]: G. Stantchev, “Virtual Trackball Modeling and the Exponential Map”, [S2CID 44199608 (2004)
+//! ](https://api.semanticscholar.org/CorpusID:44199608), [Archived PDF
+//! ](https://web.archive.org/web/2/http://www.math.umd.edu:80/~gogo/Papers/trackballExp.pdf)
+//!
+//! [radian]: https://en.wikipedia.org/wiki/Radian
 
 #![allow(clippy::collapsible_else_if)]
 #![no_std]
@@ -17,7 +31,7 @@ use kiss3d::{
 	resource::ShaderUniform,
 	window::Canvas,
 };
-use trackball::{Clamp, First, Fixed, Frame, Image, Orbit, Scale, Scene, Slide, Touch};
+use trackball::{First, Fixed, Frame, Image, Orbit, Scale, Scope, Slide, Touch};
 
 pub use kiss3d;
 pub use trackball;
@@ -52,25 +66,22 @@ pub use input::*;
 ///
 /// # Camera Alignment
 ///
-/// Realign camera via [`Self::frame`] and define user boundary conditions via [`Self::clamp`] like
-/// minimum and maximum target distance from camera eye. Optionally, update the alignment to reset
-/// to when pressing [`Input::reset_key()`] via [`Self::reset`].
+/// Realign camera via [`Self::frame`]. Optionally, update the alignment to reset to when pressing
+/// [`Input::reset_key()`] via [`Self::reset`].
 ///
 /// # Camera Projection
 ///
-/// Adjust camera projection via [`Self::scene`] like setting field of view or clip plane distances.
+/// Adjust camera projection via [`Self::scope`] like setting field of view or clip plane distances.
 #[derive(Clone)]
 pub struct Trackball {
 	/// Input keys/buttons and their modifiers.
 	pub input: Input<f32>,
-	/// Clamp as user boundary conditions of [`Frame`].
-	pub clamp: Clamp<f32>,
 	/// Frame wrt camera eye and target.
 	pub frame: Frame<f32>,
 	/// Reset frame wrt camera eye and target.
 	pub reset: Frame<f32>,
-	/// Scene wrt enclosing viewing frustum.
-	pub scene: Scene<f32>,
+	/// Scope wrt enclosing viewing frustum.
+	pub scope: Scope<f32>,
 
 	image: Image<f32>,
 	first: First<f32>,
@@ -85,22 +96,23 @@ impl Trackball {
 	/// Creates camera with eye position inclusive its roll attitude and target position.
 	///
 	/// Default viewing frustum has a fixed vertical field of view of π/4 with near and far clip
-	/// planes at 1E-1 and 1E+6.
+	/// planes at 1E-1 and 1E+3.
 	///
 	/// **Note:** Argument order differs from cameras in [`kiss3d::camera`].
 	#[must_use]
 	pub fn new(target: Point3<f32>, eye: &Point3<f32>, up: &Vector3<f32>) -> Trackball {
 		let frame = Frame::look_at(target, eye, up);
-		let reset = frame.clone();
-		let scene = Scene::default();
-		let image = Image::new(&frame, &scene, Point2::new(800.0, 600.0));
+		let reset = frame;
+		let scope = Scope::default();
+		let mut image = Image::new(&Frame::default(), &scope, Point2::new(800.0, 600.0));
+		image.set_passive(true);
+		image.compute(frame, scope);
 		Self {
 			input: Input::default(),
-			clamp: Clamp::default(),
 			first: First::default(),
 			frame,
 			reset,
-			scene,
+			scope,
 			image,
 			orbit: Orbit::default(),
 			scale: Scale::default(),
@@ -112,7 +124,7 @@ impl Trackball {
 	/// Like [`Self::new()`] but with custom viewing frustum.
 	///
 	/// For a fixed vertical field of view simply pass an [`f32`] angle in radians as `fov`,
-	/// otherwise see [`Fixed`] and [`Scene::set_fov()`].
+	/// otherwise see [`Fixed`] and [`Scope::set_fov()`].
 	///
 	/// **Note:** Argument order differs from cameras in [`kiss3d::camera`].
 	pub fn new_with_frustum(
@@ -124,8 +136,8 @@ impl Trackball {
 		zfar: f32,
 	) -> Trackball {
 		let mut trackball = Self::new(target, eye, up);
-		trackball.scene.set_fov(fov);
-		trackball.scene.set_clip_planes(znear, zfar);
+		trackball.scope.set_fov(fov);
+		trackball.scope.set_clip_planes(znear, zfar);
 		trackball
 	}
 	fn handle_touch(
@@ -146,12 +158,11 @@ impl Trackball {
 				}
 				if let Some((num, pos, rot, rat)) = self.touch.compute(Some(id), pos, 0) {
 					if self.first.enabled() {
-						if let Some(vec) = self.slide.compute(pos) {
-							if let Some((pitch, yaw, yaw_axis)) =
+						if let Some(vec) = self.slide.compute(pos)
+							&& let Some((pitch, yaw, yaw_axis)) =
 								self.first.compute(&vec, self.image.max())
-							{
-								self.frame.look_around(pitch, yaw, yaw_axis);
-							}
+						{
+							self.frame.look_around(pitch, yaw, yaw_axis);
 						}
 					} else {
 						if num == 1 {
@@ -214,7 +225,7 @@ impl Trackball {
 	fn handle_cursor_pos(&mut self, canvas: &Canvas, x: f64, y: f64, modifiers: Modifiers) {
 		let pos = Point2::new(x, y);
 		let is_eq = |old| old == pos || old == Point2::new(pos.x.floor(), pos.y.floor());
-		if self.mouse.replace(pos).map_or(true, is_eq) {
+		if self.mouse.replace(pos).is_none_or(is_eq) {
 			return;
 		}
 		let (pos, max) = (pos.cast(), *self.image.max());
@@ -246,35 +257,26 @@ impl Trackball {
 			}
 		} else {
 			self.image.set_pos(pos);
-			let orbit = self.input.orbit_button().map_or(false, |button| {
+			let orbit = self.input.orbit_button().is_some_and(|button| {
 				canvas.get_mouse_button(button) == Action::Press
-					&& self
-						.input
-						.orbit_modifiers()
-						.map_or(true, |m| m == modifiers)
+					&& self.input.orbit_modifiers().is_none_or(|m| m == modifiers)
 			});
-			let slide = self.input.slide_button().map_or(false, |button| {
+			let slide = self.input.slide_button().is_some_and(|button| {
 				canvas.get_mouse_button(button) == Action::Press
-					&& self
-						.input
-						.slide_modifiers()
-						.map_or(true, |m| m == modifiers)
+					&& self.input.slide_modifiers().is_none_or(|m| m == modifiers)
 			});
 			if orbit && slide {
 				self.orbit.discard();
 				self.slide.discard();
 			}
-			if orbit {
-				if let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1) {
-					if let Some(rot) = self.orbit.compute(&pos, &max) {
-						self.frame.local_orbit(&rot);
-					}
-				}
+			if orbit
+				&& let Some(pos) = self.touch.compute(None, pos, 0).map(|val| val.1)
+				&& let Some(rot) = self.orbit.compute(&pos, &max)
+			{
+				self.frame.local_orbit(&rot);
 			}
-			if slide {
-				if let Some(vec) = self.slide.compute(pos) {
-					self.frame.local_slide(&self.image.project_vec(&vec));
-				}
+			if slide && let Some(vec) = self.slide.compute(pos) {
+				self.frame.local_slide(&self.image.project_vec(&vec));
 			}
 		}
 	}
@@ -304,9 +306,9 @@ impl Trackball {
 			}
 		} else if action == Action::Press {
 			if Some(key) == self.input.ortho_key() {
-				self.scene.set_ortho(!self.scene.ortho());
+				self.scope.set_ortho(!self.scope.ortho());
 			} else if Some(key) == self.input.reset_key() {
-				self.frame = self.reset.clone();
+				self.frame = self.reset;
 			}
 		}
 	}
@@ -317,7 +319,7 @@ impl Trackball {
 
 impl Camera for Trackball {
 	fn clip_planes(&self) -> (f32, f32) {
-		self.scene.clip_planes(self.frame.distance())
+		self.scope.clip_planes(self.frame.distance())
 	}
 	fn view_transform(&self) -> Isometry3<f32> {
 		*self.image.view_isometry()
@@ -365,7 +367,6 @@ impl Camera for Trackball {
 		*self.image.inverse_transformation()
 	}
 	fn update(&mut self, _: &Canvas) {
-		self.frame = self.clamp.compute(self.frame.clone(), &self.scene);
-		self.image.compute(self.frame.clone(), self.scene.clone());
+		self.image.compute(self.frame, self.scope);
 	}
 }
